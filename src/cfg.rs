@@ -17,8 +17,8 @@ pub struct Cfg {
 }
 
 pub fn read_cfg(cfg_path: Option<String>) -> Result<Cfg, Box<Error>> {
-  let home_dir = dirs::home_dir().unwrap_or(PathBuf::default() );
-  let cwd_dir = std::env::current_dir().unwrap_or( PathBuf::from(".") );
+  let home_dir = dirs::home_dir().unwrap_or_default();
+  let cwd_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".") );
   let cfg_default_name = ".tagger.cfg.json";
 
   let default_paths = vec![

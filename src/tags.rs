@@ -1,57 +1,110 @@
-use git2::{Direction, RemoteCallbacks, Repository};
+use git2::{Direction, RemoteCallbacks, Repository, RemoteConnection};
 use tempdir::TempDir;
 
 use super::pkg::Pkg;
+use super::err::TaggerError;
 
 
-fn git_credentials_callback(
-  _url: &str,
-  username: Option<&str>,
-  cred_type: git2::CredentialType,
-) -> Result<git2::Cred, git2::Error> {
-  let user = username.unwrap_or("git");
-  if cred_type.contains(git2::CredentialType::USERNAME) {
-    return git2::Cred::username(user);
-  }
+static ORIGIN: &str = "origin";
+static TAG_REF_PREFIX: &str = "refs/tags/";
 
-  let home_dir = dirs::home_dir().unwrap_or_default();
-  let key_path = std::path::Path::new(&home_dir).join(".ssh/id_rsa");
-  git2::Cred::ssh_key(user, None, &key_path, None)
+
+type TaggerResult<T> = std::result::Result<T,TaggerError>;
+
+pub struct Tags<'a> {
+  pkg: &'a Pkg,
 }
 
 
-pub fn fetch_all_tags(url: &str) -> Vec<String> {
 
-  // TODO:
-  let tmp_dir = TempDir::new("tagger").unwrap();
+impl<'a> Tags<'a> {
 
-  let repo = Repository::open_bare(tmp_dir.path())
-    .unwrap_or_else(|_| Repository::init_bare(tmp_dir.path()).expect("cannot open or init repo"));
-
-  let mut remote = repo
-    .find_remote("origin")
-    .unwrap_or_else(|_| repo.remote("origin", url).unwrap());
-
-  let mut cbs = RemoteCallbacks::default();
-  cbs.credentials(&git_credentials_callback);
-
-  let connection = remote
-    .connect_auth(Direction::Fetch, Some(cbs), None)
-    .unwrap();
-
-  let ls = connection.list().unwrap();
-
-  let mut tags = Vec::new();
-
-  for l in ls {
-    let name = l.name();
-    if name.starts_with("refs/tags/") {
-      tags.push(name.replace("refs/tags/", ""));
-    }
+  fn get_tmp_dir(&self) -> TaggerResult<TempDir> {
+    let tmp_dir_name = format!("tagger__{}", self.pkg.name);
+    TempDir::new(&tmp_dir_name)
+      .or( Err(TaggerError::new( "cannot create temp directory" ) ) )
   }
 
-  tags
+  fn get_repo(&self, dir: &TempDir) -> TaggerResult<Repository> {
+    Repository::open_bare(dir.path())
+      .or_else(|_| Repository::init_bare(dir.path())
+      .or_else( |_| Err(TaggerError::new( "cannot create temp directory" ) ))
+    )
+  }
 
+  fn get_remote_callbacks(&self) -> RemoteCallbacks {
+    let mut cbs = RemoteCallbacks::default();
+
+    fn git_credentials_callback(
+      _url: &str,
+      username: Option<&str>,
+      cred_type: git2::CredentialType,
+    ) -> Result<git2::Cred, git2::Error> {
+
+      let user = username.unwrap_or("git");
+      if cred_type.contains(git2::CredentialType::USERNAME) {
+        return git2::Cred::username(user);
+      }
+
+      let home_dir = dirs::home_dir().unwrap_or_default();
+      let key_path = std::path::Path::new(&home_dir).join(".ssh/id_rsa");
+
+      git2::Cred::ssh_key(user, None, &key_path, None)
+    }
+
+    cbs.credentials(&git_credentials_callback);
+    cbs
+  }
+
+
+  fn connect_remote(&self, repo: &'static Repository) -> TaggerResult<RemoteConnection> {
+    let mut remote = repo
+      .find_remote(ORIGIN)
+      .or( repo.remote(ORIGIN, &self.pkg.url)
+      .or( Err(TaggerError::new( "cannot find or create remote with name origin" ) )
+    ))?;
+
+    let conn = (&mut remote)
+      .connect_auth(Direction::Fetch, Some(self.get_remote_callbacks()), None)
+      // .as_ref()
+      .or_else(|e| Err(TaggerError::new(
+        &format!("cannot create temp directory\n{}", e.message() )
+      ) )
+    );
+
+    conn
+
+  }
+
+
+  pub fn fetch_all<'c>(&self) -> TaggerResult<Vec<String>> {
+    let tmp_dir = self.get_tmp_dir()?;
+
+    let repo:  &'static Repository = &self.get_repo(&tmp_dir)?;
+    let connection = self.connect_remote(repo)?;
+
+    let ls = connection.list()
+      .or( Err(TaggerError::new( "cannot get remote repository referenses list" ) ) )?;
+
+    let mut tags = Vec::new();
+
+    for l in ls {
+      let name = l.name();
+      if name.starts_with(TAG_REF_PREFIX) {
+        tags.push(name.replace(TAG_REF_PREFIX, ""));
+      }
+    }
+
+    Ok(tags)
+  }
+}
+
+
+
+pub fn fetch_all_tags(url: &str) -> Vec<String> {
+  let mut tags = Vec::new();
+
+  tags
 }
 
 fn fetch_valid_tags(url: &str) -> Vec<String> {

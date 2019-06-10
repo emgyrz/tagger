@@ -5,10 +5,11 @@ use std::io::{self, Write};
 static VERSION: &str = "0.1.3";
 
 
-mod args;
 pub mod cfg;
-mod exec;
 pub mod pkg;
+pub mod err;
+mod args;
+mod exec;
 mod tags;
 
 

@@ -13,16 +13,15 @@ pub fn run(pkg: &Pkg) -> std::process::Output {
 
   let cmd = format!("yarn add {}", pkg_str);
 
-  let output = if cfg!(target_os = "windows") {
+  if cfg!(target_os = "windows") {
     Command::new("cmd")
-      .args(&["/C", &cmd ] )
+      .args(&["/C", &cmd])
       .output()
       .expect("failed to execute process")
   } else {
     Command::new("sh")
-      .args(&["-c", &cmd ])
+      .args(&["-c", &cmd])
       .output()
       .expect("failed to execute process")
-  };
-  output
+  }
 }
