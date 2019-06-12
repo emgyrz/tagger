@@ -2,7 +2,7 @@
 use std::error::Error;
 use std::io::{self, Write};
 
-static VERSION: &str = "0.1.3";
+static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 
 pub mod cfg;

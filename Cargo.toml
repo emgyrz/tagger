@@ -1,6 +1,6 @@
 [package]
 name = "tagger"
-version = "0.1.3"
+version = "0.1.5"
 authors = ["mz <emgyrz@gmail.com>"]
 edition = "2018"
 
