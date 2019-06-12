@@ -12,6 +12,7 @@ mod args;
 mod exec;
 mod tags;
 
+use tags::Tags;
 
 fn main() -> Result<(), Box<Error>> {
 
@@ -37,17 +38,16 @@ fn main() -> Result<(), Box<Error>> {
     std::process::exit(1);
   }
 
-
   if args.flag_show_latest {
     for pkg in &package_args {
-      tags::get_and_print_latest_valid_tag(&pkg);
+      Tags::new(pkg).print_latest().unwrap_or_else(|e| e.exit());
     }
     return Ok(());
   }
 
   if args.flag_list_all {
     for pkg in &package_args {
-      tags::fetch_and_list_valid_tags(&pkg);
+      Tags::new(pkg).print_all().unwrap_or_else(|e| e.exit());
     }
     return Ok(());
   }
@@ -55,7 +55,9 @@ fn main() -> Result<(), Box<Error>> {
 
   for pkg in &mut package_args {
     if pkg.version.is_none() {
-      pkg.version = tags::get_latest_valid_tag(&pkg.url);
+      let latest_version = Tags::new(pkg).get_latest()
+        .unwrap_or_else(|e| {e.exit(); String::new()});
+      pkg.version = Some(latest_version);
     }
     let out = exec::run(&pkg);
     io::stdout().write_all(&out.stdout).unwrap();
