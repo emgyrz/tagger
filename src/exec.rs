@@ -7,9 +7,7 @@ static NAME: &str = "{NAME}";
 static URL: &str = "{URL}";
 static VERSION: &str = "{VERSION}";
 
-
-pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Output, TaggerError> {
-
+fn generate_cmd_str(pkg: &Pkg, cmd_str: Option<&String>) -> Result<String, TaggerError> {
   let mut cmd_str = if let Some(cs) = cmd_str {
     cs.to_owned()
   } else {
@@ -36,14 +34,22 @@ pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Output, TaggerError> {
     cmd_str = cmd_str.replace(&URL, &pkg.url);
   }
 
+  Ok(cmd_str)
+}
+
+
+pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Output, TaggerError> {
+
+  let cmd = generate_cmd_str(pkg, cmd_str)?;
+
   let cmd_output = if cfg!(target_os = "windows") {
     Command::new("cmd")
-      .args(&["/C", &cmd_str])
+      .args(&["/C", &cmd])
       .output()
       .expect("failed to execute process")
   } else {
     Command::new("sh")
-      .args(&["-c", &cmd_str])
+      .args(&["-c", &cmd])
       .output()
       .expect("failed to execute process")
   };
