@@ -1,10 +1,16 @@
 {
-  "name": "tagger",
-  "version": "1.0.0",
+  "name": "tagger-bin",
+  "version": "1.0.1",
   "main": "index.js",
   "description": "Simple utility to do something (e.g. install) packages from git repository by selecting git tag which is presented by semver rules",
   "license": "MIT",
   "repository": "https://github.com/emgyrz/tagger",
+  "keywords": [
+    "git",
+    "tags",
+    "semver",
+    "package updating"
+  ],
   "bin": {
     "tagger": "cli.js"
   },
