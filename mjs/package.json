@@ -1,0 +1,23 @@
+{
+  "name": "tagger",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Simple utility to do something (e.g. install) packages from git repository by selecting git tag which is presented by semver rules",
+  "license": "MIT",
+  "repository": "https://github.com/emgyrz/tagger",
+  "bin": {
+    "tagger": "cli.js"
+  },
+  "author": {
+    "name": "Max Zommer",
+    "email": "emgyrz@gmail.com",
+    "url": "https://github.com/emgyrz"
+  },
+  "files": [
+    "tagger-linux64/tagger",
+    "tagger-osx64/tagger",
+    "tagger-win64/tagger.exe",
+    "cli.js",
+    "index.js"
+  ]
+}

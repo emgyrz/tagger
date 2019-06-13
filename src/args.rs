@@ -5,12 +5,12 @@ use docopt::Docopt;
 const USAGE: &str = r#"
 tagger
 
-Updater for js packages stores in gitlab. It works with git tags as versions.
+Simple utility to do something (e.g. install) packages from git repository by selecting git tag which is presented by semver rules.
 By mz <mz@addreality.com>
 
 Usage: tagger (--help | --version)
        tagger [--cfg PATH] (--show-latest | --list-all) PACKAGES...
-       tagger [--install --cfg PATH] PACKAGES...
+       tagger [--exec --cfg PATH] PACKAGES...
 
 Options:
     -h, --help              Show this message.
@@ -18,12 +18,12 @@ Options:
     -c PATH, --cfg PATH     Path to config file. If not specified config will be searching in ./.tagger.cfg.json and ~/.tagger.cfg.json"
     -l, --show-latest       Prints latest valid tag.
     -a, --list-all          Prints all valid by semver tags.
-    -i, --install           *optional. Installs specified version of package or latest.
+    -e, --exec              *optional. Do something with specified or latest package version.
 
 Examples:
     tagger ui
     tagger --show-latest hlp
-    tagger --install -c ../path_to_tagger_config.json hlp@2.1.3
+    tagger --exec -c ../path_to_tagger_config.json hlp@2.1.3
 "#;
 
 

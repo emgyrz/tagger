@@ -1,0 +1,9 @@
+{
+  "repos": [
+    {
+      "name": "tagger",
+      "url": "ssh://git@github.com:emgyrz/tagger.git"
+    }
+  ],
+  "command": "yarn add {URL}#{VERSION}"
+}
