@@ -16,5 +16,12 @@ echo "Binary for Linux (x64) created" && \
 
 # README
 cp README.md ./mjs/ && \
-echo "README file copied"
+echo "README file copied" && \
 
+
+# SHASUM256
+cd mjs && \
+rm -f SHASUM256.txt && \
+sha256sum tagger-win64/tagger.exe >> SHASUM256.txt && \
+sha256sum tagger-linux64/tagger >> SHASUM256.txt && \
+echo "SHASUM256.txt created"
