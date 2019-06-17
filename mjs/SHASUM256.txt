@@ -1,2 +1,2 @@
-ccb174fcb5688133e2bb9f143799ab11f4567ddf3e7c15961fce7c0b7b9836fd  tagger-win64/tagger.exe
-9da2bf765e778444c2cab185ed1a23ae320ba86ba6f60d472350fa4528d5679f  tagger-linux64/tagger
+e2cbdeca853a00afe38e1967bc3abfed9ee57818c4858f44f0b89df837ffe310  tagger-win64/tagger.exe
+ad9b57be51cef283bb06c67e8047f23dde5d4839cdebe7bf67721d5518989965  tagger-linux64/tagger

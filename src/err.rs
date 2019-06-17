@@ -24,7 +24,7 @@ impl TaggerError {
     TaggerError { msg: msg.to_owned() }
   }
 
-  pub fn exit(self) {
+  pub fn exit(self) -> ! {
     println!("{}", self.msg);
     std::process::exit(1);
   }

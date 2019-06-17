@@ -1,6 +1,6 @@
 
 use std::error::Error;
-use std::io::{self, Write};
+use std::io::{BufReader, BufRead};
 
 static VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -18,13 +18,12 @@ fn main() -> Result<(), Box<Error>> {
 
   let args = args::parse_args()?;
 
-
   if args.flag_version {
     println!("`tagger` version is {}", VERSION);
     return Ok(());
   }
 
-  let cfg = cfg::read_cfg(args.flag_cfg)?;
+  let cfg = cfg::read_cfg(args.flag_cfg).unwrap_or_else(|e| e.exit());
 
 
   let mut package_args = pkg::get_package_args(args.arg_PACKAGES, &cfg.repos);
@@ -51,14 +50,18 @@ fn main() -> Result<(), Box<Error>> {
 
   for pkg in &mut package_args {
     if pkg.version.is_none() {
-      let latest_version = Tags::new(pkg).get_latest().unwrap_or_else(|e| {
-        e.exit();
-        String::new()
-      });
+      let latest_version = Tags::new(pkg).get_latest().unwrap_or_else(|e| e.exit());
       pkg.version = Some(latest_version);
     }
-    let out = exec::run(&pkg, cfg.command.as_ref())?;
-    io::stdout().write_all(&out.stdout).unwrap();
+    let child_process = exec::run(&pkg, cfg.command.as_ref()).unwrap_or_else(|e| e.exit());
+
+    if let Some(out) = child_process.stdout {
+      let out_reader = BufReader::new( out );
+      let lines = out_reader.lines();
+      for line in lines {
+        println!("{}", line.unwrap());
+      }
+    }
   }
 
 

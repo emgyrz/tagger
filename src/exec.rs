@@ -1,7 +1,8 @@
 
 use super::err::TaggerError;
 use super::pkg::Pkg;
-use std::process::{Command, Output};
+use std::process::{Command, Child, Stdio};
+use std::error::Error;
 
 static NAME: &str = "{NAME}";
 static URL: &str = "{URL}";
@@ -38,21 +39,24 @@ fn generate_cmd_str(pkg: &Pkg, cmd_str: Option<&String>) -> Result<String, Tagge
 }
 
 
-pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Output, TaggerError> {
+pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Child, TaggerError> {
+  let is_win32 = cfg!(target_os = "windows");
 
+  let exec_bin_str = if is_win32 {"cmd"} else {"sh"};
+  let exec_bin_arg_str = if is_win32 {"/C"} else {"-c"};
   let cmd = generate_cmd_str(pkg, cmd_str)?;
+  let args = [exec_bin_arg_str, &cmd];
 
-  let cmd_output = if cfg!(target_os = "windows") {
-    Command::new("cmd")
-      .args(&["/C", &cmd])
-      .output()
-      .expect("failed to execute process")
-  } else {
-    Command::new("sh")
-      .args(&["-c", &cmd])
-      .output()
-      .expect("failed to execute process")
-  };
 
-  Ok(cmd_output)
+  let cmd_child = Command::new(exec_bin_str)
+    .args(&args)
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn();
+
+  match cmd_child {
+    Ok(child) => Ok(child),
+    Err(e) => Err( TaggerError::new(e.description())),
+  }
+
 }
