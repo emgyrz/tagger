@@ -1,6 +1,6 @@
 {
   "name": "tagger-bin",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "main": "index.js",
   "description": "Simple utility to do something (e.g. install) packages from git repository by selecting git tag which is presented by semver rules",
   "license": "MIT",
@@ -24,6 +24,7 @@
     "tagger-osx64/tagger",
     "tagger-win64/tagger.exe",
     "cli.js",
+    "LICENSE",
     "index.js"
   ]
 }

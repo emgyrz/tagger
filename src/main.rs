@@ -1,6 +1,6 @@
 
 use std::error::Error;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
 
 static VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -56,7 +56,7 @@ fn main() -> Result<(), Box<Error>> {
     let child_process = exec::run(&pkg, cfg.command.as_ref()).unwrap_or_else(|e| e.exit());
 
     if let Some(out) = child_process.stdout {
-      let out_reader = BufReader::new( out );
+      let out_reader = BufReader::new(out);
       let lines = out_reader.lines();
       for line in lines {
         println!("{}", line.unwrap());

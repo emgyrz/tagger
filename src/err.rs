@@ -21,7 +21,9 @@ impl StdError for TaggerError {
 
 impl TaggerError {
   pub fn new(msg: &str) -> TaggerError {
-    TaggerError { msg: msg.to_owned() }
+    TaggerError {
+      msg: msg.to_owned(),
+    }
   }
 
   pub fn exit(self) -> ! {

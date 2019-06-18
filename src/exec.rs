@@ -1,8 +1,9 @@
 
 use super::err::TaggerError;
 use super::pkg::Pkg;
-use std::process::{Command, Child, Stdio};
+
 use std::error::Error;
+use std::process::{Child, Command, Stdio};
 
 static NAME: &str = "{NAME}";
 static URL: &str = "{URL}";
@@ -42,8 +43,8 @@ fn generate_cmd_str(pkg: &Pkg, cmd_str: Option<&String>) -> Result<String, Tagge
 pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Child, TaggerError> {
   let is_win32 = cfg!(target_os = "windows");
 
-  let exec_bin_str = if is_win32 {"cmd"} else {"sh"};
-  let exec_bin_arg_str = if is_win32 {"/C"} else {"-c"};
+  let exec_bin_str = if is_win32 { "cmd" } else { "sh" };
+  let exec_bin_arg_str = if is_win32 { "/C" } else { "-c" };
   let cmd = generate_cmd_str(pkg, cmd_str)?;
   let args = [exec_bin_arg_str, &cmd];
 
@@ -56,7 +57,7 @@ pub fn run(pkg: &Pkg, cmd_str: Option<&String>) -> Result<Child, TaggerError> {
 
   match cmd_child {
     Ok(child) => Ok(child),
-    Err(e) => Err( TaggerError::new(e.description())),
+    Err(e) => Err(TaggerError::new(e.description())),
   }
 
 }

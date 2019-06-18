@@ -44,9 +44,7 @@ pub fn read_cfg(cfg_path: Option<String>) -> Result<Cfg, TaggerError> {
     if let Some(p) = def {
       p.clone()
     } else {
-      let mut err_str = String::from(
-        format!("Cannot find tagger cfg in default pathes {:?}\n", default_paths)
-      );
+      let mut err_str = format!("Cannot find tagger cfg in default pathes {:?}\n", default_paths) ;
 
       err_str.push_str("Please specify path to config, for example: \n");
       err_str.push_str(r"tagger --cfg C:\Users\Alice\.cfg.json --show-latest my_pkg");

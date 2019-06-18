@@ -20,6 +20,9 @@ echo "Binary for Linux (x64) created" && \
 cp README.md ./mjs/ && \
 echo "README file copied" && \
 
+# LICENSE
+cp LICENSE ./mjs/ && \
+echo "LICENSE file copied" && \
 
 # SHASUM256
 cd mjs && \

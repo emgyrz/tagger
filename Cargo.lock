@@ -465,7 +465,7 @@ dependencies = [
 
 [[package]]
 name = "tagger"
-version = "1.0.3"
+version = "1.0.5"
 dependencies = [
  "dirs 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "docopt 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
