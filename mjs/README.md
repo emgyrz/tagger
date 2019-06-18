@@ -48,7 +48,7 @@ Type: `Array<{name: string, url: string}>`
 List of package repositories you want to use. Each item in this list cantains `name` ( to identify it )
 and `url` know how to connect.
 Example:
-```json
+```js
 {
   "repos": [
     {
