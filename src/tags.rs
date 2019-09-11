@@ -1,7 +1,6 @@
 use git2::{Direction, RemoteCallbacks, RemoteHead, Repository};
 use tempdir::TempDir;
 
-
 use super::err::TaggerError;
 use super::pkg::Pkg;
 
@@ -15,7 +14,6 @@ pub struct Tags<'a> {
   tags: Option<Vec<String>>,
   is_fetched: bool,
 }
-
 
 impl<'a> Tags<'a> {
   pub fn new(pkg: &Pkg) -> Tags {
@@ -46,7 +44,6 @@ impl<'a> Tags<'a> {
       username: Option<&str>,
       cred_type: git2::CredentialType,
     ) -> Result<git2::Cred, git2::Error> {
-
       let user = username.unwrap_or("git");
       if cred_type.contains(git2::CredentialType::USERNAME) {
         return git2::Cred::username(user);
@@ -54,14 +51,18 @@ impl<'a> Tags<'a> {
 
       let home_dir = dirs::home_dir().unwrap_or_default();
       let key_path = std::path::Path::new(&home_dir).join(".ssh/id_rsa");
+      let key_pub_path = std::path::Path::new(&home_dir).join(".ssh/id_rsa.pub");
 
-      git2::Cred::ssh_key(user, None, &key_path, None)
+      println!("key_path: {:?}; exists: {:?}", key_path, key_path.exists());
+
+      let cred = git2::Cred::ssh_key("git", Some(&key_pub_path), &key_path, None)
+        .expect("Could not create credentials object");
+      Ok(cred)
     }
 
     cbs.credentials(&git_credentials_callback);
     cbs
   }
-
 
   fn filter_tags(&self, heads: &[RemoteHead]) -> TaggerResult<Vec<String>> {
     let mut tags = Vec::new();
@@ -142,7 +143,6 @@ impl<'a> Tags<'a> {
     Ok(())
   }
 
-
   pub fn get_latest(&mut self) -> TaggerResult<String> {
     if !self.is_fetched {
       self.fetch_all()?;
@@ -177,6 +177,4 @@ impl<'a> Tags<'a> {
     );
     Ok(())
   }
-
 }
-
